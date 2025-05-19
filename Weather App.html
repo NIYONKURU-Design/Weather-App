@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rwanda & Global Weather App</title>
+    <style>
+        /* CSS */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #87CEEB;
+        }
+
+        .container {
+            margin-top: 50px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+
+        select, input, button {
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #weatherResult {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Rwanda & Global Weather App</h1>
+        
+        <!-- Dropdown for Rwandan districts -->
+        <label for="districtSelect">Choose a district:</label>
+        <select id="districtSelect" onchange="toggleCityInput()">
+            <option value="Kigali">Kigali</option>
+            <option value="Musanze">Musanze</option>
+            <option value="Huye">Huye</option>
+            <option value="Rubavu">Rubavu</option>
+            <option value="Nyagatare">Nyagatare</option>
+            <option value="Rusizi">Rusizi</option>
+            <option value="Karongi">Karongi</option>
+            <option value="Rwamagana">Rwamagana</option>
+            <option value="Muhanga">Muhanga</option>
+            <option value="Gicumbi">Gicumbi</option>
+            <option value="Bugesera">Bugesera</option>
+            <option value="Ngororero">Ngororero</option>
+            <option value="Nyarugenge">Nyarugenge</option>
+            <option value="Kayonza">Kayonza</option>
+            <option value="Gakenke">Gakenke</option>
+            <option value="Gisagara">Gisagara</option>
+            <option value="Kirehe">Kirehe</option>
+            <option value="Rutsiro">Rutsiro</option>
+            <option value="Nyamasheke">Nyamasheke</option>
+            <option value="Burera">Burera</option>
+            <option value="Kamonyi">Kamonyi</option>
+            <option value="Nyanza">Nyanza</option>
+            <option value="Other">Other (Enter city manually)</option>
+        </select>
+
+        <!-- Input for any other city globally -->
+        <input type="text" id="cityInput" placeholder="Enter city name" style="display: none;">
+        <button onclick="getWeather()">Get Weather</button>
+        
+        <div id="weatherResult"></div>
+    </div>
+
+    <script>
+        function toggleCityInput() {
+            const districtSelect = document.getElementById("districtSelect");
+            const cityInput = document.getElementById("cityInput");
+
+            if (districtSelect.value === "Other") {
+                cityInput.style.display = "block"; // Show input field when "Other" is selected
+            } else {
+                cityInput.style.display = "none"; // Hide input field
+            }
+        }
+
+        async function getWeather() {
+            let city = document.getElementById("districtSelect").value;
+            const customCity = document.getElementById("cityInput").value;
+
+            if (city === "Other" && customCity) {
+                city = customCity; // Use the user-entered city for global searches
+            }
+
+            const apiKey = "1ab9c67b9a11d15035332fde814f7fff"; // Your actual API key
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.cod === 200) {
+                    document.getElementById("weatherResult").innerHTML = `
+                        <h2>${data.name}, ${data.sys.country || "Rwanda"}</h2>
+                        <p>🌡 Temperature: ${data.main.temp}°C</p>
+                        <p>💧 Humidity: ${data.main.humidity}%</p>
+                        <p>🌬 Wind Speed: ${data.wind.speed} m/s</p>
+                        <p>🌫 Pressure: ${data.main.pressure} hPa</p>
+                        <p>🔭 Visibility: ${data.visibility / 1000} km</p>
+                        <p>☁ Cloudiness: ${data.clouds.all}%</p>
+                        <p>🌍 Weather Condition: ${data.weather[0].description}</p>
+                    `;
+                } else {
+                    document.getElementById("weatherResult").innerHTML = `<p>Location not found!</p>`;
+                }
+            } catch (error) {
+                document.getElementById("weatherResult").innerHTML = `<p>Error fetching data. Please try again!</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
